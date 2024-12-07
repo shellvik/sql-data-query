@@ -4,8 +4,20 @@
 - [SQL Query Fundamentals](#sql-fundamantals)
     - [Cheat Sheet](#cheat-sheet)
     - [SQL Statement Fundamentals](#sql-statement-fundamentals)
-- Resouces.
-- Leetcode SQL 50 solutions.
+		- [DISTINCT](#select-distinct),&nbsp; [COUNT](#select-count),&nbsp; [WHERE](#select-where),&nbsp; [ORDER BY](#order-by),&nbsp; [LIMIT](#limit)&nbsp; [BETWEEN](#between),&nbsp; [IN](#in),&nbsp; [LIKE & ILIKE](#like-and-ilike)
+	- [GROUP BY & Aggregate Functions](#group-by--aggregation-functions)
+		- [Aggregate Functions](#aggregate-functions)
+		- [GROUP BY](#group-by)
+		- [HAVING](#having)
+	- [JOINS](#joins)
+		- [INNER JOINS](#inner-joins)
+		- [FULL OUTER JOIN](#full-outer-join)
+			- [FULL	OUTER JOIN with WHERE](#full-outer-join-with-where)
+		- [LEFT OUTER JOIN](#left-outer-join)
+			- [LEFT OUTER JOIN with WHERE](#left-outer-join-with-where)	
+- [Leetcode SQL 50 solutions](leetcode-sql-50/README.md)
+- [Additional Resouces](resources/README.md)
+
 ## Repository Structure
 ```bash
 sql-data-query
@@ -222,3 +234,130 @@ WHERE amount IN (0.99,1.98,1.99)
 		- Sherri
 - *LIKE is case-sensitive, we can use ILIKE which is case-insensitive.*
 - PostgreSQL Regex: [Documentation](https://www.postgresql.org/docs/current/functions-matching.html)
+
+### GROUP BY & Aggregation Functions
+- `GROUP BY` will allow us to aggregate data and apply functions to better understand how data is distributed per category.
+#### Aggregate Functions
+- The main idea behind an aggregate function is to take multiple inputs and return a single output.
+- **Most common Aggregate Functions** :
+	- **AVG()** : Returns the average value.
+	- **COUNT()** : Returns the number of values.
+	- **MAX()** : Returns maximum value.
+	- **MIN()** : Returns minimum values.
+	- **SUM()** : Return the sum of all values.
+- Aggregate function calls happen only in the SELECT clause or the HAVING Clause.
+- *Special Notes*
+	- AVG() returns a floating point value many decimal places.
+		- `ROUND()` can be used to specify the precision after the decimal.
+		- `SELECT ROUND(AVG(replacement_cost),2) FROM film;`
+	- COUNT() simply returns the number of rows, which means by convention we just use `COUNT(*)`.
+#### GROUP BY
+- GROUP BY allows us to aggregate columns per some category.
+![Group By 1](src/group-by-1.png)
+![Group By 2](src/group-by-2.png)
+- General Syntax:
+```sql
+SELECT category_col, AGG(data_col) 
+FROM table
+GROUP BY category_col;
+```
+- The GROUP BY clause must appear right after a FROM or WHERE statement.
+- In the SELECT statement, columns must either have an aggregate function or be in the GROUP BY call.
+- WHERE statements should not refer to the aggregation result.
+- If you want to sort results based on the aggregate, make sure to reference the entire function.
+#### HAVING
+- The `HAVING` clause allows us to filter after an aggregation has already taken place. 
+- Example:
+```sql
+SELECT company, SUM(sales) FROM finance_table WHERE company != 'Google' GROUP BY company HAVING SUM(sales) > 1000;
+```
+- Having allows us to use the aggregate result as a filter along with `GROUP BY`.
+
+## JOINS
+- Joins allow us to combine informaiton form multiple tables.
+![joins](/src/join-venn.webp)
+### INNER JOINS
+![Inner Join Venn Diagram](src/inner-join-venn.png)
+- The main reason for the different JOIN types is to decide how to deal with information only present in one of the joined tables.
+- An `INNER JOIN` will result with the set of records that match in both tables.
+- Example:
+```sql
+SELECT * FROM TableA
+INNER JOIN TableB
+ON TabelA.col_match = TableB.col_match
+```
+![Inner Join](src/inner-join.png)
+- Table order won't matter in an INNER JOIN.
+- If JOIN is used without INNER, PostgreSQL will treat it as INNER JOIN.
+### OUTER JOINS
+- There are few different types of outer joins.
+- They will allow us to specify how to deal with values only present in one of the tables being joined.
+#### FULL OUTER JOIN
+![Full outer join](src/full-outer-join-venn.png)
+- Grab everything whether it is present in one table or it is present in both tables.
+- General Syntax:
+```sql
+SELECT * FROM TableB
+FULL OUTER JOIN TableA
+ON TableA.col_match = TableB.col_match
+```
+- Example:
+![Full Outer Join](src/full-outer-join-2.png)
+##### FULL OUTER JOIN with WHERE
+![Full outer join with where](src/full-outer-join-with-where.png)
+- Get rows unique to either table(rows not found in both tables).
+- **General syntax:**
+```sql
+SELECT * FROM TableA
+FULL OUTER JOIN TableB
+ON TableA.col_match = TableB.col_match
+WHERE TableA.id IS null OR TableB.id IS null;
+```
+- Example:
+![FOJex](src/full-outer-join-where-ex.png)
+#### LEFT OUTER JOIN
+- `LEFT OUTER JOIN` keyword returns all the records from the TableA and the matching records from TableB.
+- A LEFT OUTER JOIN results in the set of records that are in the left table, if there is no match with the right table, the results are null.
+- Here the venn diagram is not symmetrical, so order matters, the first mentioned table is considered as left table.
+- **General Syntax**:
+```sql
+SELECT * FROM TableA
+LEFT OUTER JOIN TableB
+ON TableA.col_match = TableB.col_match;
+```
+![Left outer join](src/left-outer-join-1.png)
+- `LEFT OUTER JOIN` only returns things exclusive to tableA(left table).
+- Example:
+![LOJ Table Example](src/left-outer-join-2.png)
+##### LEFT OUTER JOIN with WHERE
+- Get rows unique to left table.
+- If we only wanted entries unique to TableA, Those rows found in table A and not found in TableB.
+- **General Syntax**:
+```sql
+SELECT * FROM TableA
+LEFT OUTER JOIN TableB
+ON TableA.col_match = TableB.col_match
+WHERE TableB.id IS null;
+```
+![LOJ Where](src/left-outer-join-3.png)
+- Example:
+![LOJ Ex](src/left-outer-join-4.png)
+### RIGHT JOIN
+![Right Join](src/right-join.png)
+- A RIGHT JOIN is essentially the same as a LEFT JOIN, except the tables are switched.
+- This would be the same as switching the table order in a LEFT OUTER JOIN.
+- **General Syntax**:
+```sql
+SELECT * FROM TableA
+RIGHT JOIN TableB
+ON TableA.col_match = TableB.col_match;
+```
+##### RIGHT JOIN with WHERE
+![RJ where](src/right-join-where.png)
+- *General syntax:*
+```sql
+SELECT * FROM TableA
+RIGHT JOIN TableB
+ON TableA.col_match = TableB.col_match
+WHERE TableA.id IS null;
+```
