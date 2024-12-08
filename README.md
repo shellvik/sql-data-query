@@ -14,7 +14,10 @@
 		- [FULL OUTER JOIN](#full-outer-join)
 			- [FULL	OUTER JOIN with WHERE](#full-outer-join-with-where)
 		- [LEFT OUTER JOIN](#left-outer-join)
-			- [LEFT OUTER JOIN with WHERE](#left-outer-join-with-where)	
+			- [LEFT OUTER JOIN with WHERE](#left-outer-join-with-where)
+		- [RIGHT JOIN](#right-join)
+			- [RIGHT JOIN with WHERE](#right-join-with-where)
+	- [UNION](#union)	
 - [Leetcode SQL 50 solutions](leetcode-sql-50/README.md)
 - [Additional Resouces](resources/README.md)
 
@@ -353,6 +356,7 @@ RIGHT JOIN TableB
 ON TableA.col_match = TableB.col_match;
 ```
 ##### RIGHT JOIN with WHERE
+- Get those cols only unique to TableB(right table).
 ![RJ where](src/right-join-where.png)
 - *General syntax:*
 ```sql
@@ -360,4 +364,12 @@ SELECT * FROM TableA
 RIGHT JOIN TableB
 ON TableA.col_match = TableB.col_match
 WHERE TableA.id IS null;
+```
+### UNION
+- The UNION operator is used to combine the result-set of two or more SELECT statements.
+- It basically serves to directly concatenate two results together, essentially "pasting" them together.
+```sql
+SELECT comumn_name(s) FROM table1
+UNION
+SELECT column_name(s) FROM table2;
 ```

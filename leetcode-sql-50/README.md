@@ -11,6 +11,8 @@
 **Basic Joins**
 
 6. [Replace Employee ID With The Unique Identifyer](#replace-employee-id-with-the-unique-identifyer)
+7. [Product Sales Analysis 1](#product-sales-analysis-1)
+8. [Customer Who Visited but Did Not Make Any Transaction](#customer-who-visited-but-did-not-make-any-transaction)
 
 > I'll add new things I'm learning while solving the problem as a note here that was not in the Main note section.
 
@@ -46,5 +48,39 @@ WHERE length(content) > 15;
 ```
 ### Replace Employee ID With The Unique Identifyer
 ```sql
-
+SELECT unique_id, name FROM Employees
+LEFT OUTER JOIN EmployeeUNI
+ON Employees.id = EmployeeUNI.id
+ORDER BY name;
+```
+### Product Sales Analysis 1
+```sql
+SELECT product_name, year, price FROM Sales
+FULL OUTER JOIN Product
+ON Sales.product_id = Product.product_id
+WHERE Sales.sale_id IS not null;
+```
+### Customer Who Visited but Did Not Make Any Transaction
+```sql
+SELECT customer_id, COUNT(customer_id) as count_no_trans FROM Visits
+LEFT OUTER JOIN Transactions
+ON Transactions.visit_id = Visits.visit_id
+WHERE Transactions.visit_id is null
+GROUP BY customer_id;
+```
+### Raising Temperature
+- Using self join:
+```sql
+SELECT w1.id FROM Weather w1
+JOIN Weather w2
+ON w1.recordDate = w2.recordDate + 1
+WHERE w1.temperature > w2.temperature;
+```
+- Using [Cross Join](https://learn.microsoft.com/en-us/power-query/cross-join):
+```sql
+SELECT today.id 
+FROM Weather yesterday
+CROSS JOIN Weather today
+WHERE today.recorddate - yesterday.recorddate = 1
+AND today.temperature > yesterday.temperature;
 ```
