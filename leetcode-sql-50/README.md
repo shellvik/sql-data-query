@@ -13,6 +13,7 @@
 6. [Replace Employee ID With The Unique Identifyer](#replace-employee-id-with-the-unique-identifyer)
 7. [Product Sales Analysis 1](#product-sales-analysis-1)
 8. [Customer Who Visited but Did Not Make Any Transaction](#customer-who-visited-but-did-not-make-any-transaction)
+9. [Average Time of Process per Machine](#average-time-of-process-per-machine)
 
 > I'll add new things I'm learning while solving the problem as a note here that was not in the Main note section.
 
@@ -83,4 +84,16 @@ FROM Weather yesterday
 CROSS JOIN Weather today
 WHERE today.recorddate - yesterday.recorddate = 1
 AND today.temperature > yesterday.temperature;
+```
+
+### Average Time of Process per Machine 
+- This rounding needs typecasting, else it's screaming error.
+```sql
+SELECT s.machine_id, ROUND(AVG(e.timestamp - s.timestamp)::NUMERIC,3) AS processing_time
+FROM Activity AS s JOIN Activity AS e
+ON s.machine_id = e.machine_id
+AND s.process_id = e.process_id
+AND s.activity_type = 'start'
+AND e.activity_type = 'end'
+GROUP BY s.machine_id;
 ```
